@@ -4,6 +4,7 @@ import BookGrid from './component/BookGrid';
 import SearchBar from './component/SearchBar';
 import store from "./store/index";
 import { Provider } from 'react-redux';
+import AddBookPage from './component/AddBookPage';
 
 const { Header, Footer, Content } = Layout;
 
@@ -12,6 +13,7 @@ function App() {
     <Provider store={store}>
       <Layout>
         <Header style={{background: "#3b5998", color: "white", fontSize: 25}}>Library System</Header>
+        <AddBookPage></AddBookPage>
         <Content>
           <SearchBar></SearchBar>
           <BookGrid></BookGrid>

@@ -1,4 +1,3 @@
-import ActionButton from "antd/lib/modal/ActionButton";
 import moment from "moment";
 import { bookData } from "../data/book-data"
 
@@ -6,6 +5,7 @@ const defaultState = {
     inputValue: "",
     bookInLocalStorage: [],
     isModalVisible: false,
+    isAddModalVisable: false,
     targetBook: [{
         "name": [
             "BookId"
@@ -149,9 +149,37 @@ export default (state = defaultState, action) => {
                 localStorage.setItem("books", JSON.stringify(books));
             }
         })
+        const data = books.filter((item) => {
+            return item.BookName.includes(state.inputValue);
+        })
+        return {
+            ...state,
+            bookInLocalStorage: data,
+        }
+    }
+    if(action.type === "showAddModal") {
+        return {
+            ...state,
+            isAddModalVisable: true,
+        }
+    }
+    if(action.type === "closeAddModal") {
+        return {
+            ...state,
+            isAddModalVisable: false,
+        }
+    }
+    if (action.type === "addBook") {
+        const books = JSON.parse(localStorage.getItem("books"));
+        const IdCount = books[books.length - 1].BookId;
+        action.value.BookId = IdCount + 1;
+        action.value.BookBoughtDate = action.value.BookBoughtDate.format("YYYY-MM-DD");
+        books.push(action.value);
+        localStorage.setItem("books", JSON.stringify(books));
         return {
             ...state,
             bookInLocalStorage: books,
+            isAddModalVisable: false,
         }
     }
     return state;

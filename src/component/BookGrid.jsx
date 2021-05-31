@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Input, Table, Space, Button, Modal, DatePicker } from 'antd';
 import { connect } from 'react-redux';
-import moment from 'moment';
 
 const { Column, ColumnGroup } = Table;
 
