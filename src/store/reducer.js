@@ -1,15 +1,50 @@
+import ActionButton from "antd/lib/modal/ActionButton";
+import moment from "moment";
 import { bookData } from "../data/book-data"
 
 const defaultState = {
     inputValue: "",
     bookInLocalStorage: [],
+    isModalVisible: false,
+    targetBook: [{
+        "name": [
+            "BookId"
+        ],
+        "value": ""
+    }, {
+        "name": [
+            "BookName"
+        ],
+        "value": ""
+    }, {
+        "name": [
+            "BookAuthor"
+        ],
+        "value": ""
+    }, {
+        "name": [
+            "BookBoughtDate"
+        ],
+        "value": ""
+    }, {
+        "name": [
+            "BookCategory"
+        ],
+        "value": ""
+    }, {
+        "name": [
+            "BookPublisher"
+        ],
+        "value": ""
+    }],
 }
 
+
 // eslint-disable-next-line import/no-anonymous-default-export
-export default (state = defaultState, action) => {  
+export default (state = defaultState, action) => {
     if (action.type === "getBookData") {
         var data = JSON.parse(localStorage.getItem("books"));
-        if(data === null) {
+        if (data === null) {
             data = bookData;
             localStorage.setItem("books", JSON.stringify(data));
         }
@@ -31,7 +66,79 @@ export default (state = defaultState, action) => {
         })
         return {
             ...state,
-           bookInLocalStorage: data,
+            bookInLocalStorage: data,
+        }
+    }
+    if (action.type === 'showModal') {
+        const fieldData = [{
+            "name": [
+                "BookId"
+            ],
+            "value": ""
+        }, {
+            "name": [
+                "BookName"
+            ],
+            "value": ""
+        }, {
+            "name": [
+                "BookAuthor"
+            ],
+            "value": ""
+        }, {
+            "name": [
+                "BookBoughtDate"
+            ],
+            "value": ""
+        }, {
+            "name": [
+                "BookCategory"
+            ],
+            "value": ""
+        }, {
+            "name": [
+                "BookPublisher"
+            ],
+            "value": ""
+        }]
+        const books = JSON.parse(localStorage.getItem("books"));
+        const targetBook = books.filter((item) => {
+            return item.BookId === action.value;
+        })
+        for (let i = 0; i < fieldData.length; i++) {
+            if(fieldData[i].name[0] === "BookBoughtDate") {
+                fieldData[i].value = moment(targetBook[0][fieldData[i].name[0]], "YYYY-MM-DD");
+            } else {
+                fieldData[i].value = targetBook[0][fieldData[i].name[0]];
+            }
+            console.log(fieldData[i].name)
+            
+        }
+        return {
+            ...state,
+            isModalVisible: true,
+            targetBook: fieldData,
+        }
+    }
+    if (action.type === 'submitForm') {
+        action.data.BookBoughtDate = action.data.BookBoughtDate.format("YYYY-MM-DD");
+        const books = JSON.parse(localStorage.getItem("books"));
+        const targetBook = books.map((item, index) => {
+            if (item.BookId === action.data.BookId) {
+                books.splice(index, 1, action.data);
+                localStorage.setItem("books", JSON.stringify(books));
+            }
+        })
+        return {
+            ...state,
+            bookInLocalStorage: books, 
+            isModalVisible: false,
+        }
+    }
+    if (action.type === 'closeModal') {
+        return {
+            ...state,
+            isModalVisible: false,
         }
     }
     if (action.type === 'deleteBook') {
@@ -44,7 +151,7 @@ export default (state = defaultState, action) => {
         })
         return {
             ...state,
-           bookInLocalStorage: books,
+            bookInLocalStorage: books,
         }
     }
     return state;
