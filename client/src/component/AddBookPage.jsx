@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Form, Button, Input, Modal, DatePicker } from 'antd';
 import { connect } from 'react-redux';
+import axios from 'axios';
 
 const layout = {
     labelCol: { span: 5 },
@@ -15,9 +16,14 @@ const tailLayout = {
 };
 
 class AddBookPage extends Component {
+    constructor(props) {
+        super(props);
+        this.read = this.read.bind(this);
+    } 
     render() {
         return (
             <Fragment>
+                <Button onClick={this.read}> test </Button>
                 <Button onClick={this.props.showAddModal} type="primary" block>
                     Add Book
                 </Button>
@@ -83,6 +89,12 @@ class AddBookPage extends Component {
                 </Modal>
             </Fragment>
         )
+    }
+    read() {
+        axios.post("http://localhost:3001/read")
+        .then((res) => {
+            console.log(res.data);
+        })
     }
 }
 
