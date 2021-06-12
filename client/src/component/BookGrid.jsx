@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Input, Table, Space, Button, Modal, DatePicker } from 'antd';
 import { connect } from 'react-redux';
+import axios from 'axios';
 
 const { Column, ColumnGroup } = Table;
 
@@ -92,7 +93,7 @@ class BookGrid extends Component {
             name="modifyForm"
             {...layout}
             fields={this.props.targetBook}
-            onFinish={ (val) => {this.props.submitForm(val)}}
+            onFinish={(val) => { this.props.submitForm(val) }}
             onFinishFailed={onFinishFailed}
           >
             <Form.Item
@@ -109,7 +110,7 @@ class BookGrid extends Component {
             >
               <Input />
             </Form.Item>
-                
+
             <Form.Item
               label="作者"
               name="BookAuthor"
@@ -123,8 +124,8 @@ class BookGrid extends Component {
               name="BookBoughtDate"
               rules={[{ required: true, message: 'Please input your book bought date!' }]}
             >
-             <DatePicker format={"YYYY-MM-DD"} ></DatePicker>
-            {/* <Input></Input> */}
+              <DatePicker format={"YYYY-MM-DD"} ></DatePicker>
+              {/* <Input></Input> */}
             </Form.Item>
 
             <Form.Item
@@ -143,10 +144,10 @@ class BookGrid extends Component {
               <Input />
             </Form.Item>
             <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-        </Form.Item>
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </Form.Item>
           </Form>
         </Modal>
       </Fragment>
@@ -158,6 +159,7 @@ class BookGrid extends Component {
 
 const mapStateToProps = (state) => {
   return {
+    Bookdata: state.Bookdata,
     bookInLocalStorage: state.bookInLocalStorage,
     isModalVisible: state.isModalVisible,
     targetBook: state.targetBook
@@ -167,17 +169,23 @@ const mapStateToProps = (state) => {
 const mapDispatchToPops = (dispatch) => {
   return {
     getBook() {
-      const action = {
-        type: "getBookData",
-      }
-      dispatch(action);
+      axios.post("http://localhost:3001/read")
+        .then((res) => {
+          const action = {
+            data: res.data,
+            type: "getBookData",
+          }
+          dispatch(action);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
     },
     deleteBook(value) {
-      const action = {
-        type: "deleteBook",
-        value
-      }
-      dispatch(action);
+      axios.delete(`http://localhost:3001/delete/${value}`)
+        .then((res) => {
+          this.getBook();
+        })
     },
     showModal(value) {
       const action = {
@@ -192,12 +200,19 @@ const mapDispatchToPops = (dispatch) => {
       }
       dispatch(action);
     },
-    submitForm(val) {
-      const action = {
-        type: "submitForm",
-        data: val,
-      }
-      dispatch(action);
+    submitForm(value) {
+      value.BookBoughtDate = value.BookBoughtDate.format("YYYY-MM-DD");
+      axios.put("http://localhost:3001/modify", value)
+        .then(() => {
+          axios.post("http://localhost:3001/read")
+            .then((res) => {
+              const action = {
+                data: res.data,
+                type: "submitForm",
+              }
+              dispatch(action);
+            })
+        })
     }
   }
 }

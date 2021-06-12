@@ -16,14 +16,9 @@ const tailLayout = {
 };
 
 class AddBookPage extends Component {
-    constructor(props) {
-        super(props);
-        this.read = this.read.bind(this);
-    } 
     render() {
         return (
             <Fragment>
-                <Button onClick={this.read}> test </Button>
                 <Button onClick={this.props.showAddModal} type="primary" block>
                     Add Book
                 </Button>
@@ -31,14 +26,17 @@ class AddBookPage extends Component {
                     <Form
                         name="modifyForm"
                         {...layout}
-                        onFinish={(val) => { this.props.addBook(val) }}
+                        onFinish={(val) => { 
+                            val.BookId = this.props.Bookdata[this.props.Bookdata.length - 1].BookId + 1;
+                            this.props.addBook(val) 
+                        }}
                     >
                         <Form.Item
                             label="書籍編號"
                             name="BookId"
                             hidden={true}
                         >
-                            <Input disabled={true} />
+                            <Input disabled={true}/>
                         </Form.Item>
 
                         <Form.Item
@@ -90,17 +88,12 @@ class AddBookPage extends Component {
             </Fragment>
         )
     }
-    read() {
-        axios.post("http://localhost:3001/read")
-        .then((res) => {
-            console.log(res.data);
-        })
-    }
 }
 
 const mapStateToProps = (state) => {
     return {
         isAddModalVisable: state.isAddModalVisable,
+        Bookdata: state.Bookdata
     }
 }
 
@@ -119,11 +112,18 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(action);
         },
         addBook(value) {
-            const action = {
-                type: "addBook",
-                value
-            }
-            dispatch(action);
+            value.BookBoughtDate = value.BookBoughtDate.format("YYYY-MM-DD");
+            axios.post("http://localhost:3001/insert", value)
+            .then(() => {
+                axios.post("http://localhost:3001/read")
+                .then((res) => {
+                    const action = {
+                        type: "addBook",
+                        data: res.data,
+                    }
+                    dispatch(action);
+                })
+            })
         }
     }
 }
