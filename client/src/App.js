@@ -18,7 +18,6 @@ function App() {
           <SearchBar></SearchBar>
           <BookGrid></BookGrid>
         </Content>
-        <Footer>Footer</Footer>
       </Layout>
     </Provider>
   );

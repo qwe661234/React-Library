@@ -1,4 +1,4 @@
-export var bookData = [{
+const data = [{
     "BookId":1,
     "BookCategory":"資料庫",
     "BookName":"DB2:Maximizing Performance of Online Production Systems",
@@ -601,3 +601,5 @@ export var bookData = [{
     "BookBoughtDate":"1990-06-18",
     "BookPublisher":"華泰"
 }]
+
+module.exports = data;

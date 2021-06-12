@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Form, Button, Input, Modal, DatePicker } from 'antd';
 import { connect } from 'react-redux';
+import axios from 'axios';
 
 const layout = {
     labelCol: { span: 5 },
@@ -25,14 +26,17 @@ class AddBookPage extends Component {
                     <Form
                         name="modifyForm"
                         {...layout}
-                        onFinish={(val) => { this.props.addBook(val) }}
+                        onFinish={(val) => { 
+                            val.BookId = this.props.Bookdata[this.props.Bookdata.length - 1].BookId + 1;
+                            this.props.addBook(val) 
+                        }}
                     >
                         <Form.Item
                             label="書籍編號"
                             name="BookId"
                             hidden={true}
                         >
-                            <Input disabled={true} />
+                            <Input disabled={true}/>
                         </Form.Item>
 
                         <Form.Item
@@ -89,6 +93,7 @@ class AddBookPage extends Component {
 const mapStateToProps = (state) => {
     return {
         isAddModalVisable: state.isAddModalVisable,
+        Bookdata: state.Bookdata
     }
 }
 
@@ -107,11 +112,18 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(action);
         },
         addBook(value) {
-            const action = {
-                type: "addBook",
-                value
-            }
-            dispatch(action);
+            value.BookBoughtDate = value.BookBoughtDate.format("YYYY-MM-DD");
+            axios.post("http://localhost:3001/insert", value)
+            .then(() => {
+                axios.post("http://localhost:3001/read")
+                .then((res) => {
+                    const action = {
+                        type: "addBook",
+                        data: res.data,
+                    }
+                    dispatch(action);
+                })
+            })
         }
     }
 }
