@@ -11,8 +11,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node app.js",
-    "devStart": "nodemon app.js",
+    "start": "nodemon app.js",
     "insertData": "nodemon insertData.js"
   },
   "author": "",
